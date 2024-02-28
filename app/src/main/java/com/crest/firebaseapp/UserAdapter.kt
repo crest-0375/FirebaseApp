@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.practice.firebaseapp.databinding.ItemUserBinding
+import com.squareup.picasso.Picasso
 
 class UserAdapter(private val context: Context, private val list: ArrayList<Users>) :
     RecyclerView.Adapter<UserAdapter.ViewHolder>() {
     inner class ViewHolder(private val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: Users) {
+            Picasso.get().load(user.imageUrl).into(binding.imageView)
             binding.textView.text = user.userName
             binding.textView2.text = user.userAge.toString()
             binding.textView3.text = user.userEmail
@@ -35,11 +37,17 @@ class UserAdapter(private val context: Context, private val list: ArrayList<User
             intent.putExtra("name", list[position].userName)
             intent.putExtra("age", list[position].userAge)
             intent.putExtra("email", list[position].userEmail)
+            intent.putExtra("image", list[position].imageUrl)
+            intent.putExtra("imageName", list[position].imageName)
             context.startActivity(intent)
         }
     }
 
     fun getUserId(position: Int): String {
         return list[position].userId
+    }
+
+    fun getImageName(position: Int): String {
+        return list[position].imageName
     }
 }

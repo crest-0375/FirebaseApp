@@ -9,13 +9,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.practice.firebaseapp.R
 import com.practice.firebaseapp.databinding.ActivitySignUpBinding
 
+
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private val auth = FirebaseAuth.getInstance()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         binding.signUpSupSignin.setOnClickListener {
             finish()
         }
@@ -27,6 +31,7 @@ class SignUpActivity : AppCompatActivity() {
             signUpToFireBase(email, password)
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) onBackPressedDispatcher.onBackPressed()
@@ -40,7 +45,8 @@ class SignUpActivity : AppCompatActivity() {
             finish()
         }
             .addOnFailureListener {
-                Toast.makeText(this, "Failure: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failure: ${it.localizedMessage}", Toast.LENGTH_SHORT)
+                    .show()
 
             }
     }

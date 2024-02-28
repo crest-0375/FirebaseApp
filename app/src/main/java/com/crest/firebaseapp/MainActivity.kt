@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.practice.firebaseapp.R
 import com.practice.firebaseapp.databinding.ActivityMainBinding
 
@@ -24,6 +26,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var adapter: UserAdapter
+    val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
+    val storageReference: StorageReference = firebaseStore.reference
     val auth = FirebaseAuth.getInstance()
     private val myReference: DatabaseReference = database.reference.child("Users")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,8 +50,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val id = adapter.getUserId(viewHolder.adapterPosition)
-                myReference.child(id).removeValue()
-                Toast.makeText(applicationContext, "User deleted!", Toast.LENGTH_SHORT).show()
+                val imageName = adapter.getImageName(viewHolder.adapterPosition)
+                storageReference.child("images").child("user photo").child(imageName).delete().addOnSuccessListener {
+                    myReference.child(id).removeValue().addOnSuccessListener {
+                        Toast.makeText(applicationContext, "User deleted!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
 
         }).attachToRecyclerView(binding.recyclerView)
@@ -87,8 +96,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun deleteAllUsers() {
-        myReference.removeValue().addOnCompleteListener {
-            Toast.makeText(this, "All users deleted", Toast.LENGTH_SHORT).show()
+        storageReference.child("images").delete().addOnSuccessListener {
+            myReference.removeValue().addOnCompleteListener {
+                Toast.makeText(this, "All users deleted", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

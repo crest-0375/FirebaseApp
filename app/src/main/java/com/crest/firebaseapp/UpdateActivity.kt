@@ -1,70 +1,192 @@
 package com.crest.firebaseapp
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.practice.firebaseapp.databinding.ActivityUpdateBinding
+import com.squareup.picasso.Picasso
 
 class UpdateActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUpdateBinding
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val myReference: DatabaseReference = database.reference.child("Users")
+    private lateinit var startActivityIntent: ActivityResultLauncher<Intent>
+    val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
+    val storageReference: StorageReference = firebaseStore.reference
+    var imageUri: Uri? = null
+    var mId = ""
+    var mImageUrl = ""
+    var mImageName = ""
+    var mAge = 0
+    var mName = ""
+    var mEmail = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUpdateBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.title = "Update User"
-        var id = ""
-        var age = 0
-        var name = ""
-        var email = ""
 
+        registerActivityForResult()
         if (intent.hasExtra("age"))
-            age = intent.getIntExtra("age", 0)
+            mAge = intent.getIntExtra("age", 0)
+
+        if (intent.hasExtra("image"))
+            mImageUrl = intent.getStringExtra("image").toString()
+
+        if (intent.hasExtra("imageName"))
+            mImageName = intent.getStringExtra("imageName").toString()
 
         if (intent.hasExtra("id"))
-            id = intent.getStringExtra("id").toString()
+            mId = intent.getStringExtra("id").toString()
 
         if (intent.hasExtra("name"))
-            name = intent.getStringExtra("name").toString()
+            mName = intent.getStringExtra("name").toString()
 
         if (intent.hasExtra("email"))
-            email = intent.getStringExtra("email").toString()
+            mEmail = intent.getStringExtra("email").toString()
 
-        binding.updateAgeEt.setText(age.toString())
-        binding.updateNameEt.setText(name)
-        binding.updateEmailEt.setText(email)
-
+        binding.updateAgeEt.setText(mAge.toString())
+        binding.updateNameEt.setText(mName)
+        binding.updateEmailEt.setText(mEmail)
+        Picasso.get().load(mImageUrl).into(binding.imageView)
+        binding.imageView.setOnClickListener {
+            chooseImage()
+        }
         binding.updateAddUserBtn.setOnClickListener {
-            addUserToDatabase(id)
+            binding.progressBar.visibility = View.VISIBLE
+            binding.updateAddUserBtn.isEnabled = false
+            if (imageUri != null) {
+                uploadPhoto()
+            } else {
+                addUserToDatabase(mImageUrl)
+            }
         }
     }
 
-    private fun addUserToDatabase(id:String) {
+    private fun addUserToDatabase(url: String) {
         val name: String = binding.updateNameEt.text.toString().trim()
         val email: String = binding.updateEmailEt.text.toString().trim()
         val age: Int = binding.updateAgeEt.text.toString().trim().toInt()
-
-
-        val user = Users(id, name, age, email)
-
-        myReference.child(id).setValue(user).addOnSuccessListener {
-            Toast.makeText(
-                applicationContext,
-                "The new user has been added to database.",
-                Toast.LENGTH_SHORT
-            ).show()
+        if (name == mName && email == mEmail && mAge == age)
             finish()
-        }
-            .addOnFailureListener {
+        else {
+            val user = Users(mId, name, age, email, url, mImageName)
+
+            myReference.child(mId).setValue(user).addOnSuccessListener {
                 Toast.makeText(
                     applicationContext,
-                    "Failure - ${it.localizedMessage}",
+                    "The new user has been added to database.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
+                .addOnFailureListener {
+                    Toast.makeText(
+                        applicationContext,
+                        "Failure - ${it.localizedMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+    }
+
+    private fun registerActivityForResult() {
+        startActivityIntent = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(), ActivityResultCallback { result ->
+                val resultCode = result.resultCode
+                val imageData = result.data
+
+                if (resultCode == RESULT_OK && imageData != null) {
+                    imageUri = imageData.data
+                    imageUri?.let {
+                        Picasso.get().load(it).into(binding.imageView)
+                    }
+                }
+            }
+        )
+    }
+
+    private fun chooseImage() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+        if (ContextCompat.checkSelfPermission(
+                this,
+                permission
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(permission), 1)
+        } else {
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityIntent.launch(intent)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            startActivityIntent.launch(intent)
+
+        }
+    }
+
+    private fun uploadPhoto() {
+        val imageReference = storageReference.child("images").child("user photo")
+            .child(mImageName)
+        imageUri?.let { uri ->
+            imageReference.putFile(uri).addOnSuccessListener {
+                val uploadedImageRef =
+                    storageReference.child("images").child("user photo").child(mImageName)
+                uploadedImageRef.downloadUrl.addOnSuccessListener { url ->
+                    addUserToDatabase(url.toString())
+                }
+                    .addOnFailureListener { e ->
+                        binding.progressBar.visibility = View.GONE
+                        binding.updateAddUserBtn.isEnabled = true
+                        Toast.makeText(
+                            applicationContext,
+                            "Failure: ${e.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }.addOnFailureListener { e ->
+                binding.progressBar.visibility = View.GONE
+                binding.updateAddUserBtn.isEnabled = true
+                Toast.makeText(
+                    applicationContext,
+                    "Failure: ${e.localizedMessage}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
     }
 
 }
