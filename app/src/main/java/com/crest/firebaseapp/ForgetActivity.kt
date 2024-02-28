@@ -8,7 +8,7 @@ import com.practice.firebaseapp.databinding.ActivityForgetBinding
 
 class ForgetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityForgetBinding
-    val auth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityForgetBinding.inflate(layoutInflater)

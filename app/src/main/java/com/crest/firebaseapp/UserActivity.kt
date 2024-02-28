@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -27,9 +26,9 @@ class UserActivity : AppCompatActivity() {
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val myReference: DatabaseReference = database.reference.child("Users")
     private lateinit var startActivityIntent: ActivityResultLauncher<Intent>
-    val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
-    val storageReference: StorageReference = firebaseStore.reference
-    var imageUri: Uri? = null
+    private val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
+    private val storageReference: StorageReference = firebaseStore.reference
+    private var imageUri: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserBinding.inflate(layoutInflater)
@@ -61,26 +60,23 @@ class UserActivity : AppCompatActivity() {
 
         myReference.child(id).setValue(user).addOnSuccessListener {
             Toast.makeText(
-                applicationContext,
-                "The new user has been added to database.",
-                Toast.LENGTH_SHORT
+                applicationContext, "The new user has been added to database.", Toast.LENGTH_SHORT
             ).show()
             finish()
+        }.addOnFailureListener {
+            binding.progressBar.visibility = View.GONE
+            binding.addUserBtn.isEnabled = true
+            Toast.makeText(
+                applicationContext, "Failure - ${it.localizedMessage}", Toast.LENGTH_SHORT
+            ).show()
         }
-            .addOnFailureListener {
-                binding.progressBar.visibility = View.GONE
-                binding.addUserBtn.isEnabled = true
-                Toast.makeText(
-                    applicationContext,
-                    "Failure - ${it.localizedMessage}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
     }
 
     private fun registerActivityForResult() {
-        startActivityIntent = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(), ActivityResultCallback { result ->
+        startActivityIntent =
+            registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
                 val resultCode = result.resultCode
                 val imageData = result.data
 
@@ -91,7 +87,6 @@ class UserActivity : AppCompatActivity() {
                     }
                 }
             }
-        )
     }
 
     private fun chooseImage() {
@@ -101,8 +96,7 @@ class UserActivity : AppCompatActivity() {
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
         if (ContextCompat.checkSelfPermission(
-                this,
-                permission
+                this, permission
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(this, arrayOf(permission), 1)
@@ -115,9 +109,7 @@ class UserActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
@@ -132,8 +124,7 @@ class UserActivity : AppCompatActivity() {
 
     private fun uploadPhoto() {
         val imageName = System.currentTimeMillis().toString()
-        val imageReference = storageReference.child("images").child("user photo")
-            .child(imageName)
+        val imageReference = storageReference.child("images").child("user photo").child(imageName)
         imageUri?.let { uri ->
             imageReference.putFile(uri).addOnSuccessListener {
                 val uploadedImageRef =
@@ -141,23 +132,18 @@ class UserActivity : AppCompatActivity() {
                 uploadedImageRef.downloadUrl.addOnSuccessListener { url ->
                     val imageUrl = url.toString()
                     addUserToDatabase(imageUrl, imageName)
+                }.addOnFailureListener { e ->
+                    binding.progressBar.visibility = View.GONE
+                    binding.addUserBtn.isEnabled = true
+                    Toast.makeText(
+                        applicationContext, "Failure: ${e.localizedMessage}", Toast.LENGTH_SHORT
+                    ).show()
                 }
-                    .addOnFailureListener { e ->
-                        binding.progressBar.visibility = View.GONE
-                        binding.addUserBtn.isEnabled = true
-                        Toast.makeText(
-                            applicationContext,
-                            "Failure: ${e.localizedMessage}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
             }.addOnFailureListener { e ->
                 binding.progressBar.visibility = View.GONE
                 binding.addUserBtn.isEnabled = true
                 Toast.makeText(
-                    applicationContext,
-                    "Failure: ${e.localizedMessage}",
-                    Toast.LENGTH_SHORT
+                    applicationContext, "Failure: ${e.localizedMessage}", Toast.LENGTH_SHORT
                 ).show()
             }
         }

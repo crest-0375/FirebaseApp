@@ -12,19 +12,20 @@
         android:layout_height="55dp"
         android:layout_marginTop="52dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="@string/email"
         android:inputType="textEmailAddress"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:autofillHints="" />
 
     <Button
         android:id="@+id/fotget_btn"
         android:layout_width="300dp"
         android:layout_height="55dp"
         android:layout_marginTop="20dp"
-        android:text="Sign In"
+        android:text="@string/sign_in"
         android:textAllCaps="true"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="@+id/forget_et_email"

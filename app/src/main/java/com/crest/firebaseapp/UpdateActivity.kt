@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -26,15 +25,15 @@ class UpdateActivity : AppCompatActivity() {
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private val myReference: DatabaseReference = database.reference.child("Users")
     private lateinit var startActivityIntent: ActivityResultLauncher<Intent>
-    val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
-    val storageReference: StorageReference = firebaseStore.reference
-    var imageUri: Uri? = null
-    var mId = ""
-    var mImageUrl = ""
-    var mImageName = ""
-    var mAge = 0
-    var mName = ""
-    var mEmail = ""
+    private val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
+    private val storageReference: StorageReference = firebaseStore.reference
+    private var imageUri: Uri? = null
+    private var mId = ""
+    private var mImageUrl = ""
+    private var mImageName = ""
+    private var mAge = 0
+    private var mName = ""
+    private var mEmail = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,18 +107,18 @@ class UpdateActivity : AppCompatActivity() {
 
     private fun registerActivityForResult() {
         startActivityIntent = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(), ActivityResultCallback { result ->
-                val resultCode = result.resultCode
-                val imageData = result.data
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            val resultCode = result.resultCode
+            val imageData = result.data
 
-                if (resultCode == RESULT_OK && imageData != null) {
-                    imageUri = imageData.data
-                    imageUri?.let {
-                        Picasso.get().load(it).into(binding.imageView)
-                    }
+            if (resultCode == RESULT_OK && imageData != null) {
+                imageUri = imageData.data
+                imageUri?.let {
+                    Picasso.get().load(it).into(binding.imageView)
                 }
             }
-        )
+        }
     }
 
     private fun chooseImage() {

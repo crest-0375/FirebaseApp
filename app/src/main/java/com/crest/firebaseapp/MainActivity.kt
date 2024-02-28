@@ -1,6 +1,5 @@
 package com.crest.firebaseapp
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -26,9 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var adapter: UserAdapter
-    val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
+    private val firebaseStore: FirebaseStorage = FirebaseStorage.getInstance()
     val storageReference: StorageReference = firebaseStore.reference
-    val auth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
     private val myReference: DatabaseReference = database.reference.child("Users")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,12 +50,13 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val id = adapter.getUserId(viewHolder.adapterPosition)
                 val imageName = adapter.getImageName(viewHolder.adapterPosition)
-                storageReference.child("images").child("user photo").child(imageName).delete().addOnSuccessListener {
-                    myReference.child(id).removeValue().addOnSuccessListener {
-                        Toast.makeText(applicationContext, "User deleted!", Toast.LENGTH_SHORT)
-                            .show()
+                storageReference.child("images").child("user photo").child(imageName).delete()
+                    .addOnSuccessListener {
+                        myReference.child(id).removeValue().addOnSuccessListener {
+                            Toast.makeText(applicationContext, "User deleted!", Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
-                }
             }
 
         }).attachToRecyclerView(binding.recyclerView)
@@ -72,10 +72,10 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == R.id.delete_all_user) {
             AlertDialog.Builder(this).setTitle("Delete all Users?")
                 .setMessage("Are you sure you want to delete all the users? you can delete one user by swiping left and right.")
-                .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, _ ->
+                .setPositiveButton("Yes") { dialog, _ ->
                     deleteAllUsers()
                     dialog.dismiss()
-                })
+                }
                 .setNegativeButton("No", null)
                 .create().show()
 
@@ -83,12 +83,12 @@ class MainActivity : AppCompatActivity() {
         if (item.itemId == R.id.sign_out) {
             AlertDialog.Builder(this).setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Yes", DialogInterface.OnClickListener { dialog, _ ->
+                .setPositiveButton("Yes") { dialog, _ ->
                     auth.signOut()
                     startActivity(Intent(this, LoginActivity::class.java))
                     finish()
                     dialog.dismiss()
-                })
+                }
                 .setNegativeButton("No", null)
                 .create().show()
         }
