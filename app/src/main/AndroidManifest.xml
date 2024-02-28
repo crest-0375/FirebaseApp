@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,7 +15,16 @@
         android:theme="@style/Theme.FirebaseApp"
         tools:targetApi="31">
         <activity
-            android:name="com.crest.firebaseapp.MainActivity"
+            android:name="com.crest.firebaseapp.NumberActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.crest.firebaseapp.ForgetActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.crest.firebaseapp.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.crest.firebaseapp.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +32,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.crest.firebaseapp.UpdateActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.crest.firebaseapp.UserActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.crest.firebaseapp.MainActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".MyFirebaseService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING.EVENT" />
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notifications_active_24" />
     </application>
 
 </manifest>

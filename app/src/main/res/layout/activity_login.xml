@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    tools:context="com.crest.firebaseapp.LoginActivity">
+
+    <EditText
+        android:id="@+id/login_et_email"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="52dp"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/signin_btn"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        android:text="Sign In"
+        android:textAllCaps="true"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/login_et_pass"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/login_et_pass"
+        app:layout_constraintTop_toBottomOf="@+id/login_et_pass" />
+
+    <Button
+        android:id="@+id/signup_btn"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:text="Sign Up"
+        android:textAllCaps="true"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/signin_btn"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/signin_btn"
+        app:layout_constraintTop_toBottomOf="@+id/signin_btn" />
+
+    <Button
+        android:id="@+id/forgot_btn"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:text="Forgot Password"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/signup_btn"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/signup_btn"
+        app:layout_constraintTop_toBottomOf="@+id/signup_btn" />
+
+    <Button
+        android:id="@+id/sign_in_with_number"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:text="Sign in with number"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/forgot_btn"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/forgot_btn"
+        app:layout_constraintTop_toBottomOf="@+id/forgot_btn" />
+
+    <EditText
+        android:id="@+id/login_et_pass"
+        android:layout_width="300dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/login_et_email"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/login_et_email"
+        app:layout_constraintTop_toBottomOf="@+id/login_et_email" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

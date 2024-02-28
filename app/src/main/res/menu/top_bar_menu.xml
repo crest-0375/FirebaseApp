@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/delete_all_user"
+        android:icon="@drawable/delete_icon"
+        android:title="delete all users"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/sign_out"
+        android:icon="@drawable/round_logout_24"
+        android:title="Sign out"
+        app:showAsAction="never" />
+</menu>
